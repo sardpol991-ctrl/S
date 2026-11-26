@@ -9,8 +9,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Unpack sources
-        run: for f in *.zip; do unzip -q -o "$f"; done
+      - name: Unpack newest source zip
+        run: |
+          ZIP=$(ls DarkPassenger-v*.zip | sort -V | tail -n 1)
+          echo "Using $ZIP"
+          rm -rf DarkPassenger
+          unzip -q "$ZIP"
+          grep -q "animations()" DarkPassenger/src/main/java/dev/passenger/DexterListener.java
+          grep -q "use-custom-models" DarkPassenger/src/main/resources/config.yml
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
@@ -22,5 +28,5 @@ jobs:
         run: mvn -B clean package
       - uses: actions/upload-artifact@v4
         with:
-          name: DarkPassenger
+          name: DarkPassenger-1.1.0
           path: DarkPassenger/target/DarkPassenger-*.jar
